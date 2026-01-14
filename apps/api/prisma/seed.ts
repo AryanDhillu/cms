@@ -1,8 +1,13 @@
 import { prisma } from "../src/lib/prisma";
+import { Role } from "@prisma/client";
 
 async function main() {
-  const program = await prisma.program.create({
-    data: {
+  // 1. Upsert Program (Idempotent)
+  const program = await prisma.program.upsert({
+    where: { id: "11111111-1111-1111-1111-111111111111" },
+    update: {},
+    create: {
+      id: "11111111-1111-1111-1111-111111111111",
       title: "Demo Program",
       status: "published",
       publishedAt: new Date(),
@@ -26,6 +31,21 @@ async function main() {
   });
 
   console.log("Seeded program ID:", program.id);
+
+  // 2. Upsert User Role (Idempotent)
+  // Replace with your actual Supabase User ID
+  const SUPABASE_USER_ID = "b6d7e9bf-a067-436c-b3c6-d2eb4d3f5c40"; 
+
+  await prisma.userRole.upsert({
+    where: { userId: SUPABASE_USER_ID },
+    update: {},
+    create: {
+      userId: SUPABASE_USER_ID,
+      role: Role.ADMIN,
+    },
+  });
+  
+  console.log("Seeded user role for:", SUPABASE_USER_ID);
 }
 
 main()

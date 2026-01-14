@@ -1,0 +1,13 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Program {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+}

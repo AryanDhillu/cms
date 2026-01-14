@@ -6,8 +6,55 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum PublishStatus {
+  draft
+  scheduled
+  published
+  archived
+}
+
+enum LessonContentType {
+  video
+  article
+}
+
 model Program {
-  id        String   @id @default(uuid())
+  id          String        @id @default(uuid())
+  title       String
+  status      PublishStatus @default(draft)
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  terms       Term[]
+}
+
+model Term {
+  id         String   @id @default(uuid())
+  programId String
+  termNumber Int
+  title      String?
+  createdAt  DateTime @default(now())
+
+  program    Program @relation(fields: [programId], references: [id])
+  lessons    Lesson[]
+
+  @@unique([programId, termNumber])
+}
+
+model Lesson {
+  id        String            @id @default(uuid())
+  termId    String
+  lessonNumber Int
   title     String
+  status    PublishStatus     @default(draft)
+  publishedAt DateTime?
+
+  contentType LessonContentType
+  durationMs Int?
+
   createdAt DateTime @default(now())
+
+  term       Term @relation(fields: [termId], references: [id])
+
+  @@unique([termId, lessonNumber])
 }

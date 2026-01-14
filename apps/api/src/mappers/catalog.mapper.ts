@@ -22,3 +22,26 @@ export function mapProgram(program: any) {
     })),
   };
 }
+
+export function mapLesson(lesson: any) {
+  return {
+    id: lesson.id,
+    lessonNumber: lesson.lessonNumber,
+    title: lesson.title,
+    contentType: lesson.contentType,
+    durationMs: lesson.durationMs,
+    publishedAt: lesson.publishedAt,
+
+    term: {
+      id: lesson.term.id,
+      termNumber: lesson.term.termNumber,
+      title: lesson.term.title,
+    },
+
+    program: {
+      id: lesson.term.program.id,
+      title: lesson.term.program.title,
+      publishedAt: lesson.term.program.publishedAt,
+    },
+  };
+}

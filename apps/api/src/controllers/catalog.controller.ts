@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
-import { mapProgram } from "../mappers/catalog.mapper";
+import { mapProgram, mapLesson } from "../mappers/catalog.mapper";
+import { getCatalogProgramById, getCatalogLessonById } from "../services/catalog.service";
 
 export async function getPrograms(req: Request, res: Response) {
   const limit = Number(req.query.limit) || 10;
@@ -54,4 +55,53 @@ export async function getPrograms(req: Request, res: Response) {
       nextCursor,
     },
   });
+}
+
+export async function getProgramById(req: Request, res: Response) {
+  const { id } = req.params;
+
+  if (typeof id !== 'string') {
+    return res.status(400).json({
+      code: "BAD_REQUEST",
+      message: "Invalid ID",
+    });
+  }
+
+  const program = await getCatalogProgramById(id);
+
+  if (!program) {
+    return res.status(404).json({
+      code: "NOT_FOUND",
+      message: "Program not found",
+    });
+  }
+
+  // Cache for public catalog
+  res.setHeader("Cache-Control", "public, max-age=60");
+
+  return res.json(mapProgram(program));
+}
+
+export async function getLessonById(req: Request, res: Response) {
+  const { id } = req.params;
+
+  if (typeof id !== 'string') {
+    return res.status(400).json({
+      code: "BAD_REQUEST",
+      message: "Invalid ID",
+    });
+  }
+
+  const lesson = await getCatalogLessonById(id);
+
+  if (!lesson) {
+    return res.status(404).json({
+      code: "NOT_FOUND",
+      message: "Lesson not found",
+    });
+  }
+
+  res.setHeader("Cache-Control", "public, max-age=60");
+
+  return res.json(mapLesson(lesson));
 }

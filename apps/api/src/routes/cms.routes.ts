@@ -5,14 +5,21 @@ import {
   createProgram, 
   listPrograms, 
   getProgram, 
-  updateProgram 
+  updateProgram,
+  publishProgram,
+  unpublishProgram 
 } from "../controllers/program.controller";
 import { 
   createTerm, 
   updateTerm, 
   getTerm 
 } from "../controllers/term.controller";
-import { createLesson, updateLesson } from "../controllers/lesson.controller";
+import { 
+  createLesson, 
+  updateLesson,
+  publishLesson,
+  unpublishLesson 
+} from "../controllers/lesson.controller";
 import { assignUserRole, createCMSUser } from "../controllers/user.controller";
 
 const router = Router();
@@ -47,6 +54,20 @@ router.put(
 );
 
 router.post(
+  "/programs/:id/publish",
+  authenticate,
+  requireRole(["ADMIN", "EDITOR"]),
+  publishProgram
+);
+
+router.post(
+  "/programs/:id/unpublish",
+  authenticate,
+  requireRole(["ADMIN", "EDITOR"]),
+  unpublishProgram
+);
+
+router.post(
   "/programs/:programId/terms",
   authenticate,
   requireRole(["ADMIN", "EDITOR"]),
@@ -65,6 +86,20 @@ router.get(
   authenticate,
   requireRole(["ADMIN", "EDITOR"]),
   getTerm
+);
+
+router.post(
+  "/lessons/:id/publish",
+  authenticate,
+  requireRole(["ADMIN", "EDITOR"]),
+  publishLesson
+);
+
+router.post(
+  "/lessons/:id/unpublish",
+  authenticate,
+  requireRole(["ADMIN", "EDITOR"]),
+  unpublishLesson
 );
 
 router.post(

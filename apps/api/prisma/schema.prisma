@@ -33,6 +33,11 @@ model Program {
   description      String?
   language_primary String        @default("en")
 
+  // Media
+  thumbnailUrl String?
+  bannerUrl    String?
+  portraitUrl  String?
+
   terms       Term[]
 }
 
@@ -62,7 +67,11 @@ model Lesson {
 
   createdAt DateTime @default(now())
 
-  term       Term @relation(fields: [termId], references: [id])
+  // Media
+  videoUrl      String?
+  thumbnailUrl  String?
+
+  term       Term @relation(fields: [termId], references: [id], onDelete: Cascade)
 
   @@unique([termId, lessonNumber])
 }

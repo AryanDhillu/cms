@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { getPrograms, getProgramById, getLessonById } from "../controllers/catalog.controller";
+import { listPrograms, getProgramDetail, getLessonDetail } from "../controllers/catalog.controller";
 
 const router = Router();
 
-router.get("/programs", getPrograms);
-router.get("/programs/:id", getProgramById);
-router.get("/lessons/:id", getLessonById);
+router.get("/programs", listPrograms);
+router.get("/programs/:id", getProgramDetail);
+router.get("/lessons/:id", getLessonDetail);
 
 export default router;

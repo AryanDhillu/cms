@@ -2,38 +2,69 @@ import { prisma } from "../src/lib/prisma";
 import { Role } from "@prisma/client";
 
 async function main() {
-  // 1. Upsert Program (Idempotent)
+  console.log("🌱 Seeding catalog with media...");
+
+  // 1. Upsert Program (Rich Demo Data)
   const program = await prisma.program.upsert({
     where: { id: "11111111-1111-1111-1111-111111111111" },
-    update: {},
+    update: {
+      title: "Demo Program",
+      description: "A Netflix-style demo program showing full capabilities.",
+      status: "published",
+      publishedAt: new Date(),
+      thumbnailUrl: "https://images.unsplash.com/photo-1522199710521-72d69614c702",
+      bannerUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+      portraitUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
+    },
     create: {
       id: "11111111-1111-1111-1111-111111111111",
       title: "Demo Program",
+      description: "A Netflix-style demo program showing full capabilities.",
       status: "published",
       publishedAt: new Date(),
+      
+      // Media
+      thumbnailUrl: "https://images.unsplash.com/photo-1522199710521-72d69614c702",
+      bannerUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
+      portraitUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
+
       terms: {
-        create: {
-          termNumber: 1,
-          title: "Term 1",
-          lessons: {
-            create: {
-              lessonNumber: 1,
-              title: "Published Lesson",
-              status: "published",
-              publishedAt: new Date(),
-              contentType: "video",
-              durationMs: 600000,
+        create: [
+          {
+            title: "Season 1",
+            termNumber: 1,
+            lessons: {
+              create: [
+                {
+                  lessonNumber: 1,
+                  title: "Introduction",
+                  contentType: "video",
+                  durationMs: 600000,
+                  status: "published",
+                  publishedAt: new Date(),
+                  videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                  thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+                },
+                {
+                  lessonNumber: 2,
+                  title: "Foundations",
+                  contentType: "video",
+                  durationMs: 720000,
+                  status: "draft",
+                  videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                  thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+                },
+              ],
             },
           },
-        },
+        ],
       },
     },
   });
 
-  console.log("Seeded program ID:", program.id);
+  console.log("✅ Seeded Program:", program.id);
 
   // 2. Upsert User Role (Idempotent)
-  // Replace with your actual Supabase User ID
   const SUPABASE_USER_ID = "b6d7e9bf-a067-436c-b3c6-d2eb4d3f5c40"; 
 
   await prisma.userRole.upsert({
@@ -45,12 +76,12 @@ async function main() {
     },
   });
   
-  console.log("Seeded user role for:", SUPABASE_USER_ID);
+  console.log("✅ Seeded user role for:", SUPABASE_USER_ID);
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seed failed", e);
     process.exit(1);
   })
   .finally(async () => {

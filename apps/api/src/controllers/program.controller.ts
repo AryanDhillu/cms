@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
+// Force re-check
 // GET /cms/programs
 export const listPrograms = async (req: Request, res: Response) => {
   try {
@@ -16,13 +17,16 @@ export const listPrograms = async (req: Request, res: Response) => {
 // POST /cms/programs
 export const createProgram = async (req: Request, res: Response) => {
   try {
-    const { title, description, language_primary } = req.body;
+    const { title, description, language_primary, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
     
     const program = await prisma.program.create({
       data: {
         title,
         description,
         language_primary: language_primary || "en",
+        thumbnailUrl,
+        bannerUrl,
+        portraitUrl,
         status: "draft",
       },
     });
@@ -64,7 +68,7 @@ export const getProgram = async (req: Request, res: Response) => {
 export const updateProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { title, description, language_primary, status } = req.body;
+    const { title, description, language_primary, status, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
 
     const program = await prisma.program.update({
       where: { id },
@@ -73,11 +77,52 @@ export const updateProgram = async (req: Request, res: Response) => {
         description,
         language_primary,
         status,
+        thumbnailUrl,
+        bannerUrl,
+        portraitUrl,
       },
     });
 
     res.json(program);
   } catch (error) {
     res.status(500).json({ message: "Failed to update program" });
+  }
+};
+
+// POST /cms/programs/:id/publish
+export const publishProgram = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const program = await prisma.program.update({
+      where: { id },
+      data: {
+        status: "published",
+        publishedAt: new Date(),
+      },
+    });
+
+    res.json(program);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to publish program" });
+  }
+};
+
+// POST /cms/programs/:id/unpublish
+export const unpublishProgram = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const program = await prisma.program.update({
+      where: { id },
+      data: {
+        status: "draft",
+        publishedAt: null,
+      },
+    });
+
+    res.json(program);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to unpublish program" });
   }
 };

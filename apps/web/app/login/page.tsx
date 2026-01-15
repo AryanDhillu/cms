@@ -32,9 +32,17 @@ export default function LoginPage() {
 
     if (data.session) {
       setSuccess(true);
-      // Redirect after short delay (UX friendly)
+
+      // Set cookie for Server Components
+      // Note: 'Secure' flag can prevent cookies from being set on localhost (http).
+      // We conditionally apply it only in production.
+      const isProduction = process.env.NODE_ENV === "production";
+      document.cookie = `access_token=${data.session.access_token}; path=/; max-age=${data.session.expires_in}; SameSite=Lax${isProduction ? "; Secure" : ""}`;
+
+      // Redirect after short delay
       setTimeout(() => {
-        window.location.href = "/cms";
+        // Force full page reload to ensure Server Components pick up the new cookie
+        window.location.href = "/dashboard";
       }, 800);
     }
   }

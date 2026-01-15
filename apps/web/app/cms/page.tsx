@@ -23,6 +23,7 @@ export default function CMSPage() {
           className="text-sm text-red-600 hover:underline"
           onClick={async () => {
             await supabase.auth.signOut();
+            document.cookie = "access_token=; path=/; max-age=0; SameSite=Lax; Secure";
             window.location.href = "/login";
           }}
         >

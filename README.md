@@ -137,6 +137,13 @@ The application is deployed across multiple platforms to ensure optimal performa
 - **Worker**: Deployed on **Railway** as a Cron Job to handle background tasks.
 - **Database**: Managed PostgreSQL database hosted on **Supabase**.
 
+## Login Credentials
+
+Use the following credentials to access the admin dashboard:
+
+- **Email**: `admin@test.com`
+- **Password**: `Password@123`
+
 ## Demo Walkthrough
 
 To experience the full lifecycle of the CMS, follow these steps:

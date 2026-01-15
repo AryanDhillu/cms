@@ -30,6 +30,8 @@ model Program {
   status      PublishStatus @default(draft)
   publishedAt DateTime?
   createdAt   DateTime      @default(now())
+  description      String?
+  language_primary String        @default("en")
 
   terms       Term[]
 }

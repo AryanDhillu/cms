@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from 'express';
+import cors from 'cors';
 import catalogRoutes from "./routes/catalog.routes";
 import meRouter from "./routes/me.route";
 import cmsRouter from "./routes/cms.routes";
@@ -8,6 +9,7 @@ import adminRoutes from "./routes/admin.routes";
 const app = express();
 const port = process.env.PORT || 3001;
 
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
 app.get('/health', (_req, res) => {

@@ -35,10 +35,10 @@ export default async function DashboardLayout({
           </Link>
 
           <Link
-            href="/dashboard/content"
+            href="/dashboard/programs"
             className="block px-3 py-2 text-sm rounded hover:bg-white/10 transition-colors"
           >
-            Content
+            Programs
           </Link>
 
           {user.role === "ADMIN" && (

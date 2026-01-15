@@ -11,13 +11,14 @@ export const requireRole = (allowedRoles: Role[]) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const roleRecord = await prisma.userRole.findUnique({
-      where: { userId: user.id },
+    const userRecord = await prisma.user.findUnique({
+      where: { id: user.id },
     });
 
-    const role = roleRecord?.role ?? "VIEWER";
+    const role = userRecord?.role ?? "VIEWER";
 
     if (!allowedRoles.includes(role)) {
+      console.log(`[Authorization] Access denied for user ${userRecord?.email || user.id}. Role: ${role}. Required: ${allowedRoles.join(",")}`);
       return res.status(403).json({ message: "Forbidden" });
     }
 

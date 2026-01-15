@@ -33,10 +33,19 @@ router.get("/me", authenticate, async (req, res) => {
       });
     }
 
-    console.log(`[AUTH] User ${authUser.id} (${authUser.email}) not found in CMS User table.`);
-    return res.status(403).json({
-      code: "NOT_REGISTERED",
-      message: "User not registered in CMS. Contact admin.",
+    // [MODIFIED] Auto-onboard subsequent users as VIEWERS (or ADMIN for dev convenience if needed)
+    console.log(`[AUTH] User ${authUser.email} not found. Auto-registering as ADMIN (Dev Mode).`);
+    const newUser = await prisma.user.create({
+        data: {
+          id: authUser.id,
+          email: authUser.email!,
+          role: "ADMIN", // TODO: Change to VIEWER in production
+        },
+    });
+
+    return res.json({
+      user: authUser,
+      role: newUser.role,
     });
   }
 

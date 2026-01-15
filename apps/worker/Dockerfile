@@ -14,8 +14,8 @@ RUN npm install
 # 5. Copy rest of the worker code
 COPY . .
 
-# 6. Generate Prisma Client (uses the copied schema)
-RUN npm run generate
+# 6. Generate Prisma Client (skips copying schema from ../api, assumes it's copied in step 3 or present)
+RUN npx prisma generate
 
 # 7. Build TypeScript
 RUN npm run build

@@ -17,13 +17,22 @@ export const listPrograms = async (req: Request, res: Response) => {
 // POST /cms/programs
 export const createProgram = async (req: Request, res: Response) => {
   try {
-    const { title, description, language_primary, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
+    const { title, description, languagePrimary, languagesAvailable, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
     
+    // Default validation values
+    const primary = languagePrimary || "en";
+    const available = languagesAvailable && languagesAvailable.length > 0 ? languagesAvailable : [primary];
+
+    if (!available.includes(primary)) {
+        return res.status(400).json({ message: "Primary language must be included in available languages" });
+    }
+
     const program = await prisma.program.create({
       data: {
         title,
         description,
-        language_primary: language_primary || "en",
+        languagePrimary: primary,
+        languagesAvailable: available,
         thumbnailUrl,
         bannerUrl,
         portraitUrl,
@@ -68,14 +77,26 @@ export const getProgram = async (req: Request, res: Response) => {
 export const updateProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { title, description, language_primary, status, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
+    const { title, description, languagePrimary, languagesAvailable, status, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
+
+    // Fetch existing if partial update
+    const current = await prisma.program.findUnique({ where: { id } });
+    if (!current) return res.status(404).json({ message: "Program not found" });
+
+    const newPrimary = languagePrimary || current.languagePrimary;
+    const newAvailable = languagesAvailable || current.languagesAvailable;
+
+    if (!newAvailable.includes(newPrimary)) {
+        return res.status(400).json({ message: "Primary language must be included in available languages" });
+    }
 
     const program = await prisma.program.update({
       where: { id },
       data: {
         title,
         description,
-        language_primary,
+        languagePrimary: newPrimary,
+        languagesAvailable: newAvailable,
         status,
         thumbnailUrl,
         bannerUrl,

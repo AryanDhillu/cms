@@ -13,7 +13,7 @@ export function ProgramHeader({ program }: { program: any }) {
             </div>
             <div className="flex gap-2">
                <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded border border-blue-200 text-sm uppercase font-mono tracking-wide">
-                  {program.language_primary}
+                  {program.languagePrimary}
                </span>
                <span className={`px-3 py-1 rounded border text-sm uppercase font-mono tracking-wide ${
                   program.status === 'published' 

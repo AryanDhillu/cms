@@ -5,10 +5,34 @@ import { prisma } from "../lib/prisma";
 export const createLesson = async (req: Request, res: Response) => {
   try {
     const termId = req.params.termId as string;
-    const { title, contentType, duration, videoUrl, thumbnailUrl } = req.body; // duration is in minutes
+    const { 
+        title, contentType, duration, videoUrl, thumbnailUrl,
+        contentLanguagePrimary, contentLanguagesAvailable, contentUrlsByLanguage 
+    } = req.body; 
 
     if (!termId || !title || !contentType) {
         return res.status(400).json({ message: "Term ID, title and content type are required" });
+    }
+
+    // Language defaults/logic
+    const primaryLang = contentLanguagePrimary || "en";
+    const availableLangs = contentLanguagesAvailable || [primaryLang];
+    const urlsByLang = contentUrlsByLanguage || (videoUrl ? { [primaryLang]: videoUrl } : {});
+
+    // Validation
+    if (!availableLangs.includes(primaryLang)) {
+        return res.status(400).json({ message: "Primary content language must be included" });
+    }
+    if (!urlsByLang[primaryLang] && contentType === 'video') { 
+        // Only enforce for video if strictly following rules, 
+        // basically "if primary language content URL missing"
+        // But if videoUrl is missing, maybe it's fine for draft?
+        // Prompt says "Primary language content URL missing" error is required rule.
+        // Assuming this applies when data is provided.
+        // If it's a draft, maybe looser? 
+        // Spec: "Backend Validation Rules (Very Important) ... throw new Error"
+        // I will return 400.
+        return res.status(400).json({ message: "Primary language content URL missing" });
     }
 
     // Get current lessons count to determine next number
@@ -21,9 +45,14 @@ export const createLesson = async (req: Request, res: Response) => {
         termId,
         title,
         contentType,
-        durationMs: duration ? duration * 60 * 1000 : 0, // Convert minutes to ms
-        videoUrl,
+        durationMs: duration ? duration * 60 * 1000 : 0, 
+        videoUrl, // Legacy/Fallback
         thumbnailUrl,
+        
+        contentLanguagePrimary: primaryLang,
+        contentLanguagesAvailable: availableLangs,
+        contentUrlsByLanguage: urlsByLang,
+
         lessonNumber: lessonsCount + 1,
         status: "draft"
       },
@@ -40,7 +69,13 @@ export const createLesson = async (req: Request, res: Response) => {
 export const updateLesson = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { title, contentType, duration, videoUrl, thumbnailUrl } = req.body;
+    const { 
+        title, contentType, duration, videoUrl, thumbnailUrl,
+        contentLanguagePrimary, contentLanguagesAvailable, contentUrlsByLanguage
+    } = req.body;
+
+    const current = await prisma.lesson.findUnique({ where: { id } });
+    if (!current) return res.status(404).json({ message: "Lesson not found" });
 
     const updateData: any = {};
     if (title) updateData.title = title;
@@ -48,6 +83,26 @@ export const updateLesson = async (req: Request, res: Response) => {
     if (duration !== undefined) updateData.durationMs = duration * 60 * 1000;
     if (videoUrl !== undefined) updateData.videoUrl = videoUrl;
     if (thumbnailUrl !== undefined) updateData.thumbnailUrl = thumbnailUrl;
+
+    // Language updates with validation
+    if (contentLanguagePrimary || contentLanguagesAvailable || contentUrlsByLanguage) {
+        const newPrimary = contentLanguagePrimary || current.contentLanguagePrimary;
+        const newAvailable = contentLanguagesAvailable || current.contentLanguagesAvailable;
+        // cast current.contentUrlsByLanguage to any/object to be safe
+        const currentUrls = current.contentUrlsByLanguage as any || {};
+        const newUrls = contentUrlsByLanguage || currentUrls;
+
+        if (!newAvailable.includes(newPrimary)) {
+            return res.status(400).json({ message: "Primary content language must be included" });
+        }
+        if (!newUrls[newPrimary] && (contentType === 'video' || current.contentType === 'video')) {
+             return res.status(400).json({ message: "Primary language content URL missing" });
+        }
+
+        updateData.contentLanguagePrimary = newPrimary;
+        updateData.contentLanguagesAvailable = newAvailable;
+        updateData.contentUrlsByLanguage = newUrls;
+    }
 
     const lesson = await prisma.lesson.update({
       where: { id },

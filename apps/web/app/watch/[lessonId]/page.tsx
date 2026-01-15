@@ -2,10 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getYoutubeId } from "@/lib/youtube";
 
-async function getLesson(id: string) {
+async function getLesson(id: string, language?: string) {
   try {
+    const query = language ? `?language=${language}` : "";
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/catalog/lessons/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/catalog/lessons/${id}${query}`,
         { cache: "no-store" } // or revalidate
       );
     if (!res.ok) return null; 
@@ -17,9 +18,14 @@ async function getLesson(id: string) {
 
 export const dynamic = "force-dynamic";
 
-export default async function WatchPage({ params }: { params: Promise<{ lessonId: string }> }) {
+export default async function WatchPage({ params, searchParams }: { 
+    params: Promise<{ lessonId: string }>,
+    searchParams: Promise<{ language?: string }>
+}) {
   const { lessonId } = await params;
-  const lesson = await getLesson(lessonId);
+  const { language } = await searchParams;
+  const lesson = await getLesson(lessonId, language);
+
 
   if (!lesson) {
     notFound();

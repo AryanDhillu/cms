@@ -12,6 +12,11 @@ async function main() {
       description: "A Netflix-style demo program showing full capabilities.",
       status: "published",
       publishedAt: new Date(),
+      
+      // Language
+      languagePrimary: "en",
+      languagesAvailable: ["en"],
+
       thumbnailUrl: "https://images.unsplash.com/photo-1522199710521-72d69614c702",
       bannerUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
       portraitUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
@@ -22,6 +27,10 @@ async function main() {
       description: "A Netflix-style demo program showing full capabilities.",
       status: "published",
       publishedAt: new Date(),
+      
+      // Language
+      languagePrimary: "en",
+      languagesAvailable: ["en"],
       
       // Media
       thumbnailUrl: "https://images.unsplash.com/photo-1522199710521-72d69614c702",
@@ -42,6 +51,12 @@ async function main() {
                   durationMs: 600000,
                   status: "published",
                   publishedAt: new Date(),
+                  
+                  // Language
+                  contentLanguagePrimary: "en",
+                  contentLanguagesAvailable: ["en"],
+                  contentUrlsByLanguage: { en: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+
                   videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                   thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
                 },
@@ -51,6 +66,12 @@ async function main() {
                   contentType: "video",
                   durationMs: 720000,
                   status: "draft",
+                  
+                  // Language
+                  contentLanguagePrimary: "en",
+                  contentLanguagesAvailable: ["en"],
+                  contentUrlsByLanguage: { en: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+
                   videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                   thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
                 },

@@ -5,19 +5,27 @@ import { prisma } from "../lib/prisma";
 // GET /catalog/programs
 export const listPrograms = async (req: Request, res: Response) => {
   try {
-    const programs = await prisma.program.findMany({
-      where: {
-        status: "published", // Lowercase as established in schema/seeds
-        terms: {
-          some: {
-            lessons: {
-              some: {
-                status: "published",
-              },
+    const language = req.query.language as string | undefined;
+
+    const where: any = {
+      status: "published",
+      terms: {
+        some: {
+          lessons: {
+            some: {
+              status: "published",
             },
           },
         },
       },
+    };
+
+    if (language) {
+        where.languagesAvailable = { has: language };
+    }
+
+    const programs = await prisma.program.findMany({
+      where,
       orderBy: { publishedAt: "desc" },
       select: {
         id: true,
@@ -26,6 +34,8 @@ export const listPrograms = async (req: Request, res: Response) => {
         thumbnailUrl: true,
         bannerUrl: true,
         portraitUrl: true,
+        languagesAvailable: true,
+        languagePrimary: true,
       },
     });
 
@@ -76,6 +86,7 @@ export const getProgramDetail = async (req: Request, res: Response) => {
 export const getLessonDetail = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
+    const requestedLanguage = req.query.language as string | undefined;
 
     // Check if lesson is published and parent program is published
     // We can join tables to check parent program status
@@ -94,7 +105,9 @@ export const getLessonDetail = async (req: Request, res: Response) => {
         title: true,
         videoUrl: true,
         thumbnailUrl: true,
-        durationMs: true
+        durationMs: true,
+        contentLanguagePrimary: true,
+        contentUrlsByLanguage: true,
       }
     });
 
@@ -102,7 +115,26 @@ export const getLessonDetail = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Lesson not found or unavailable" });
     }
 
-    res.json(lesson);
+    // Resolve URL with fallback
+    // contentUrlsByLanguage is Json, need to cast
+    const urls = lesson.contentUrlsByLanguage as Record<string, string> || {};
+    const primaryLang = lesson.contentLanguagePrimary || "en";
+    
+    // Logic: requested ?? primary ?? legacy videoUrl
+    const url = (requestedLanguage && urls[requestedLanguage]) 
+        ? urls[requestedLanguage] 
+        : (urls[primaryLang] || lesson.videoUrl);
+
+    if (!url) {
+        return res.status(404).json({ message: "Content unavailable this language" });
+    }
+
+    // Return the resolved URL as videoUrl for frontend compatibility
+    res.json({
+        ...lesson,
+        videoUrl: url,
+        // We can expose the available languages if we want
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to fetch lesson detail" });

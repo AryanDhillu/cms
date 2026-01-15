@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { LanguageSelector } from "../_components/LanguageSelector";
+
 export const dynamic = "force-dynamic";
 
 async function getProgram(id: string) {
@@ -17,9 +19,14 @@ async function getProgram(id: string) {
   }
 }
 
-export default async function ProgramPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProgramPage({ params, searchParams }: { 
+    params: Promise<{ id: string }>,
+    searchParams: Promise<{ language?: string }> 
+}) {
   const { id } = await params;
+  const { language } = await searchParams;
   const program = await getProgram(id);
+  const currentLanguage = language || program?.languagePrimary || 'en';
 
   if (!program) {
     notFound();
@@ -34,7 +41,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: `url(${program.bannerUrl})` }}
              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
              </div>
         ) : (
             <div className="absolute inset-0 bg-gray-900" />
@@ -45,22 +52,30 @@ export default async function ProgramPage({ params }: { params: Promise<{ id: st
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl drop-shadow-md mb-8">
                 {program.description}
             </p>
+
+            {/* Language Selector */}
+            {program.languagesAvailable && program.languagesAvailable.length > 0 && (
+                <div className="mb-8">
+                    <LanguageSelector 
+                        languages={program.languagesAvailable} 
+                        currentLanguage={currentLanguage} 
+                    />
+                </div>
+            )}
         </div>
       </div>
 
       <div className="container mx-auto px-4 md:px-12 mt-8">
-        {program.terms?.map((term: any) => (
+                        {program.terms?.map((term: any) => (
             <div key={term.id} className="mb-12">
                 <h2 className="text-2xl font-semibold mb-4 text-gray-200">
-                    <span className="text-gray-500 font-normal mr-2">Season {term.termNumber}</span>
+                    <span className="text-gray-500 font-normal mr-2">Term {term.termNumber}</span>
                     {term.title}
-                </h2>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                </h2>                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {term.lessons?.map((lesson: any) => (
                         <Link 
                             key={lesson.id} 
-                            href={`/watch/${lesson.id}`}
+                            href={`/watch/${lesson.id}?language=${currentLanguage}`}
                             className="group block bg-gray-900 rounded-md overflow-hidden hover:bg-gray-800 transition-colors"
                         >
                             <div className="aspect-video relative overflow-hidden">

@@ -20,6 +20,8 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
   const [editThumbnailUrl, setEditThumbnailUrl] = useState("");
   const [editBannerUrl, setEditBannerUrl] = useState("");
   const [editPortraitUrl, setEditPortraitUrl] = useState("");
+  const [editPublishAt, setEditPublishAt] = useState("");
+  const [publishOption, setPublishOption] = useState("now"); // 'now' | 'schedule'
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Term Creation State
@@ -36,6 +38,11 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
         setEditThumbnailUrl(data.thumbnailUrl || "");
         setEditBannerUrl(data.bannerUrl || "");
         setEditPortraitUrl(data.portraitUrl || "");
+        
+        if (data.publishAt) {
+            setEditPublishAt(new Date(data.publishAt).toISOString().slice(0, 16)); // Format for datetime-local
+            setPublishOption("schedule");
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -43,6 +50,14 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
 
   async function updateProgram() {
     setIsUpdating(true);
+    let finalPublishAt = null;
+
+    if (publishOption === 'now') {
+        finalPublishAt = new Date().toISOString();
+    } else if (publishOption === 'schedule' && editPublishAt) {
+        finalPublishAt = new Date(editPublishAt).toISOString();
+    }
+
     try {
       const res = await apiFetch(`/cms/programs/${programId}`, {
         method: "PUT",
@@ -52,6 +67,7 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
           thumbnailUrl: editThumbnailUrl,
           bannerUrl: editBannerUrl,
           portraitUrl: editPortraitUrl,
+          publishAt: finalPublishAt
         }),
       });
       
@@ -63,7 +79,8 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
           description: editDescription,
           thumbnailUrl: editThumbnailUrl,
           bannerUrl: editBannerUrl,
-          portraitUrl: editPortraitUrl
+          portraitUrl: editPortraitUrl,
+          publishAt: finalPublishAt
       }));
       alert("Program details saved.");
     } catch (err) {
@@ -129,6 +146,9 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
             editPortraitUrl={editPortraitUrl} setEditPortraitUrl={setEditPortraitUrl}
             isUpdating={isUpdating} updateProgram={updateProgram}
             programStatus={program.status} togglePublish={togglePublish}
+            publishOption={publishOption} setPublishOption={setPublishOption}
+            editPublishAt={editPublishAt} setEditPublishAt={setEditPublishAt}
+            savedPublishAt={program.publishAt}
          />
 
          <div className="md:col-span-2 space-y-6">

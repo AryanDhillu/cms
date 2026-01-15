@@ -13,6 +13,11 @@ interface ProgramSettingsProps {
     updateProgram: () => void;
     programStatus: string;
     togglePublish: () => void;
+    publishOption: string;
+    setPublishOption: (val: string) => void;
+    editPublishAt: string;
+    setEditPublishAt: (val: string) => void;
+    savedPublishAt: string | null;
 }
 
 export function ProgramSettings({ 
@@ -22,12 +27,67 @@ export function ProgramSettings({
     editBannerUrl, setEditBannerUrl,
     editPortraitUrl, setEditPortraitUrl,
     isUpdating, updateProgram, 
-    programStatus, togglePublish 
+    programStatus, togglePublish,
+    publishOption, setPublishOption,
+    editPublishAt, setEditPublishAt,
+    savedPublishAt
 }: ProgramSettingsProps) {
     return (
          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm h-fit">
             <h2 className="text-lg font-semibold mb-4 text-gray-900">Program Settings</h2>
             
+            <div className="mb-4">
+               <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-gray-700">Status</label>
+                  <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${
+                      programStatus === 'published' ? 'bg-green-100 text-green-800' :
+                      (savedPublishAt && new Date(savedPublishAt) > new Date()) ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                  }`}>
+                      {programStatus === 'published' ? 'Published' : 
+                       (savedPublishAt && new Date(savedPublishAt) > new Date()) ? 
+                       `Scheduled: ${new Date(savedPublishAt).toLocaleString()}` : 'Draft'}
+                  </span>
+               </div>
+            </div>
+
+            <div className="mb-6 p-3 bg-gray-50 rounded border border-gray-100">
+               <label className="text-sm font-medium text-gray-700 block mb-2">Publishing</label>
+               <div className="space-y-2">
+                   <label className="flex items-center gap-2 cursor-pointer">
+                       <input 
+                           type="radio" 
+                           name="pubOption"
+                           checked={publishOption === 'now'}
+                           onChange={() => setPublishOption('now')}
+                           className="text-blue-600 focus:ring-blue-500"
+                       />
+                       <span className="text-sm text-gray-700">Publish Immediately</span>
+                   </label>
+                   <label className="flex items-center gap-2 cursor-pointer">
+                       <input 
+                           type="radio" 
+                           name="pubOption" 
+                           checked={publishOption === 'schedule'}
+                           onChange={() => setPublishOption('schedule')}
+                           className="text-blue-600 focus:ring-blue-500"
+                       />
+                       <span className="text-sm text-gray-700">Schedule Publish</span>
+                   </label>
+               </div>
+               
+               {publishOption === 'schedule' && (
+                   <div className="mt-3 ml-6">
+                       <input 
+                           type="datetime-local"
+                           className="w-full border border-gray-300 rounded p-2 text-sm"
+                           value={editPublishAt}
+                           onChange={(e) => setEditPublishAt(e.target.value)}
+                       />
+                   </div>
+               )}
+            </div>
+
             <div className="space-y-4">
                <div>
                   <label className="text-sm font-medium text-gray-700 block mb-1">Title</label>

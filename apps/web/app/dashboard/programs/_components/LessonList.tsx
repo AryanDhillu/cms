@@ -79,7 +79,24 @@ export function LessonList({
                                             </div>
                                         </td>
                                         <td className="p-3 align-middle">
-                                            <span className="text-gray-400 text-sm">-</span>
+                                            <div className="flex flex-col gap-1 w-32">
+                                                <select
+                                                    className="w-full border border-gray-300 rounded text-xs p-1"
+                                                    value={editLessonData.publishOption}
+                                                    onChange={e => setEditLessonData({...editLessonData, publishOption: e.target.value})}
+                                                >
+                                                    <option value="now">Publish Now</option>
+                                                    <option value="schedule">Schedule</option>
+                                                </select>
+                                                {editLessonData.publishOption === 'schedule' && (
+                                                    <input 
+                                                        type="datetime-local"
+                                                        className="w-full border border-gray-300 rounded p-1 text-xs"
+                                                        value={editLessonData.publishAt}
+                                                        onChange={e => setEditLessonData({...editLessonData, publishAt: e.target.value})}
+                                                    />
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="p-3 align-middle">
                                             <div className="flex items-center gap-2">
@@ -108,23 +125,17 @@ export function LessonList({
                                             <span className={`text-xs px-2 py-0.5 rounded border border-gray-200 uppercase ${
                                                 lesson.status === 'published' 
                                                 ? 'bg-green-50 text-green-700 border-green-200' 
+                                                : (lesson.publishAt && new Date(lesson.publishAt) > new Date())
+                                                ? 'bg-blue-50 text-blue-700 border-blue-200'
                                                 : 'bg-gray-100 text-gray-500'
                                             }`}>
-                                                {lesson.status}
+                                                {lesson.status === 'published' ? 'Published' : 
+                                                 (lesson.publishAt && new Date(lesson.publishAt) > new Date()) ? 
+                                                 'Scheduled' : 'Draft'}
                                             </span>
                                         </td>
                                         <td className="p-3 align-middle text-right">
                                             <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                                                <button 
-                                                    onClick={() => toggleLessonPublish(lesson)}
-                                                    className={`text-xs font-medium uppercase ${
-                                                        lesson.status === 'published' 
-                                                        ? 'text-red-500 hover:text-red-700' 
-                                                        : 'text-green-600 hover:text-green-700'
-                                                    }`}
-                                                >
-                                                    {lesson.status === 'published' ? 'Unpublish' : 'Publish'}
-                                                </button>
                                                 <button 
                                                     onClick={() => startEditingLesson(lesson)}
                                                     className="text-gray-400 hover:text-blue-600 font-medium text-sm"

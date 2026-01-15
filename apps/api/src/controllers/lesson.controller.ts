@@ -71,7 +71,8 @@ export const updateLesson = async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const { 
         title, contentType, duration, videoUrl, thumbnailUrl,
-        contentLanguagePrimary, contentLanguagesAvailable, contentUrlsByLanguage
+        contentLanguagePrimary, contentLanguagesAvailable, contentUrlsByLanguage,
+        publishAt, status
     } = req.body;
 
     const current = await prisma.lesson.findUnique({ where: { id } });
@@ -83,6 +84,8 @@ export const updateLesson = async (req: Request, res: Response) => {
     if (duration !== undefined) updateData.durationMs = duration * 60 * 1000;
     if (videoUrl !== undefined) updateData.videoUrl = videoUrl;
     if (thumbnailUrl !== undefined) updateData.thumbnailUrl = thumbnailUrl;
+    if (publishAt !== undefined) updateData.publishAt = publishAt;
+    if (status) updateData.status = status;
 
     // Language updates with validation
     if (contentLanguagePrimary || contentLanguagesAvailable || contentUrlsByLanguage) {

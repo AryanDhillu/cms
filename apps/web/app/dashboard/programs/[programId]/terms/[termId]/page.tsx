@@ -18,7 +18,10 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
 
   // Lesson Edit
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
-  const [editLessonData, setEditLessonData] = useState<any>({ title: "", contentType: "video", duration: 10, videoUrl: "", thumbnailUrl: "" });
+  const [editLessonData, setEditLessonData] = useState<any>({ 
+      title: "", contentType: "video", duration: 10, videoUrl: "", thumbnailUrl: "",
+      publishOption: "now", publishAt: "" 
+  });
 
   // Create Lesson Form State
   const [title, setTitle] = useState("");
@@ -56,16 +59,35 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
 
   function startEditingLesson(lesson: any) {
     setEditingLessonId(lesson.id);
+    
+    let pubOption = "now";
+    let pubAt = "";
+    if (lesson.publishAt) {
+        pubOption = "schedule";
+        pubAt = new Date(lesson.publishAt).toISOString().slice(0, 16);
+    }
+
     setEditLessonData({
         title: lesson.title,
         contentType: lesson.contentType,
         duration: Math.round(lesson.durationMs / 60000),
         videoUrl: lesson.videoUrl || "",
-        thumbnailUrl: lesson.thumbnailUrl || ""
+        thumbnailUrl: lesson.thumbnailUrl || "",
+        publishOption: pubOption,
+        publishAt: pubAt
     });
   }
 
   async function updateLesson(lessonId: string) {
+    let finalPublishAt = null;
+    if (editLessonData.publishOption === 'now') {
+        // Only set to now if previously scheduled? Or always update to now if selected?
+        // Requirement: "If “publish now” → publishAt = now"
+        finalPublishAt = new Date().toISOString(); 
+    } else if (editLessonData.publishOption === 'schedule' && editLessonData.publishAt) {
+        finalPublishAt = new Date(editLessonData.publishAt).toISOString();
+    }
+
     try {
         await apiFetch(`/cms/lessons/${lessonId}`, {
             method: "PUT",
@@ -74,7 +96,8 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
                 contentType: editLessonData.contentType,
                 duration: Number(editLessonData.duration),
                 videoUrl: editLessonData.videoUrl,
-                thumbnailUrl: editLessonData.thumbnailUrl
+                thumbnailUrl: editLessonData.thumbnailUrl,
+                publishAt: finalPublishAt
             })
         });
         
@@ -87,7 +110,17 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
                 contentType: editLessonData.contentType,
                 durationMs: editLessonData.duration * 60000,
                 videoUrl: editLessonData.videoUrl,
-                thumbnailUrl: editLessonData.thumbnailUrl
+                thumbnailUrl: editLessonData.thumbnailUrl,
+                publishAt: finalPublishAt,
+                status: (finalPublishAt && new Date(finalPublishAt) <= new Date()) ? 'published' : 'draft' 
+                // Note: The worker will actually set it to published if <= now.
+                // But specifically the requirement says "Status stays DRAFT" if scheduled.
+                // If "now" selected -> set publishAt=now. Status might be Draft until worker picks it up?
+                // Visual feedback requirement: "🟢 Published", "🕒 Scheduled".
+                // I will update local state optimistically or wait for refresh.
+                // The worker runs every minute.
+                // For "Scheduled", date > now, status = draft/scheduled.
+                // For "Now", date <= now, status = draft -> published (by worker).
             } : l)
         }));
         setEditingLessonId(null);

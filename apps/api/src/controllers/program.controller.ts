@@ -77,7 +77,10 @@ export const getProgram = async (req: Request, res: Response) => {
 export const updateProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { title, description, languagePrimary, languagesAvailable, status, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
+    const { 
+        title, description, languagePrimary, languagesAvailable, status, 
+        thumbnailUrl, bannerUrl, portraitUrl, publishAt 
+    } = req.body;
 
     // Fetch existing if partial update
     const current = await prisma.program.findUnique({ where: { id } });
@@ -98,9 +101,10 @@ export const updateProgram = async (req: Request, res: Response) => {
         languagePrimary: newPrimary,
         languagesAvailable: newAvailable,
         status,
+        publishAt,
         thumbnailUrl,
         bannerUrl,
-        portraitUrl,
+        portraitUrl
       },
     });
 

@@ -7,13 +7,14 @@ interface LessonListProps {
     updateLesson: (id: string) => void;
     startEditingLesson: (lesson: any) => void;
     toggleLessonPublish: (lesson: any) => void;
+    deleteLesson: (lessonId: string) => void;
 }
 
 export function LessonList({
     term,
     editingLessonId, setEditingLessonId,
     editLessonData, setEditLessonData,
-    updateLesson, startEditingLesson, toggleLessonPublish
+    updateLesson, startEditingLesson, toggleLessonPublish, deleteLesson
 }: LessonListProps) {
     return (
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -141,6 +142,13 @@ export function LessonList({
                                                     className="text-gray-400 hover:text-blue-600 font-medium text-sm"
                                                 >
                                                     Edit
+                                                </button>
+                                                <button 
+                                                    onClick={() => deleteLesson(lesson.id)}
+                                                    className="text-gray-400 hover:text-red-600 text-sm"
+                                                    title="Delete Lesson"
+                                                >
+                                                    🗑
                                                 </button>
                                             </div>
                                         </td>

@@ -1,4 +1,5 @@
 apps/api/.env
+apps/worker/.env
 apps/web/.env.local
 
 **/node_modules

@@ -11,6 +11,13 @@ export default function CreateUserForm() {
   const [isError, setIsError] = useState(false);
 
   async function submit() {
+    // Validation
+    if (!email || !email.includes("@")) {
+      setIsError(true);
+      setMessage("Please enter a valid email address");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
     setIsError(false);

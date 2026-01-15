@@ -18,6 +18,7 @@ interface ProgramSettingsProps {
     editPublishAt: string;
     setEditPublishAt: (val: string) => void;
     savedPublishAt: string | null;
+    deleteProgram: () => void;
 }
 
 export function ProgramSettings({ 
@@ -30,7 +31,8 @@ export function ProgramSettings({
     programStatus, togglePublish,
     publishOption, setPublishOption,
     editPublishAt, setEditPublishAt,
-    savedPublishAt
+    savedPublishAt,
+    deleteProgram
 }: ProgramSettingsProps) {
     return (
          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm h-fit">
@@ -159,6 +161,15 @@ export function ProgramSettings({
                     }`}
                   >
                     {programStatus === 'published' ? "Unpublish Program" : "Publish Program"}
+                  </button>
+               </div>
+
+               <div className="pt-4 border-t border-gray-200 mt-4">
+                  <button 
+                     onClick={deleteProgram}
+                     className="w-full py-2 px-4 rounded font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-100 transition-colors text-sm"
+                  >
+                     Delete Program
                   </button>
                </div>
             </div>

@@ -79,6 +79,16 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
   }
 
   async function updateLesson(lessonId: string) {
+    // Validation
+    if (!editLessonData.title || editLessonData.title.trim().length === 0) {
+        alert("Lesson title is required");
+        return;
+    }
+    if (editLessonData.contentType === 'video' && (!editLessonData.videoUrl || editLessonData.videoUrl.trim().length === 0)) {
+        alert("Video URL is required for video lessons");
+        return;
+    }
+
     let finalPublishAt = null;
     if (editLessonData.publishOption === 'now') {
         // Only set to now if previously scheduled? Or always update to now if selected?
@@ -153,7 +163,15 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
   }
 
   async function createLesson() {
-    if (!title) return;
+    if (!title || title.trim().length === 0) {
+        alert("Lesson title is required");
+        return;
+    }
+    if (contentType === 'video' && (!videoUrl || videoUrl.trim().length === 0)) {
+        alert("Video URL is required for video lessons");
+        return;
+    }
+    
     setIsCreating(true);
 
     try {
@@ -173,6 +191,27 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
         console.error(error);
         alert("Failed to create lesson");
         setIsCreating(false);
+    }
+  }
+
+  async function deleteLesson(lessonId: string) {
+    if (!confirm("Delete Lesson?\nThis action cannot be undone.")) return;
+
+    try {
+        const res = await apiFetch(`/cms/lessons/${lessonId}`, {
+            method: "DELETE"
+        });
+
+        if (!res.ok) throw new Error("Failed to delete lesson");
+        
+        // Optimistic update
+        setTerm((t: any) => ({
+            ...t,
+            lessons: t.lessons.filter((l: any) => l.id !== lessonId)
+        }));
+    } catch (e: any) {
+        console.error(e);
+        alert("Failed to delete lesson: " + (e.message || "Unknown error"));
     }
   }
 
@@ -202,6 +241,7 @@ export default function LessonsPage({ params }: { params: Promise<{ programId: s
                 updateLesson={updateLesson}
                 startEditingLesson={startEditingLesson}
                 toggleLessonPublish={toggleLessonPublish}
+                deleteLesson={deleteLesson}
             />
         </div>
 

@@ -12,8 +12,11 @@ export default function NewProgramPage() {
   const router = useRouter();
 
   async function create() {
-    if (!title) return;
-    
+    if (!title || title.trim().length === 0) {
+      alert("Program title is required");
+      return;
+    }
+
     setLoading(true);
     try {
       await apiFetch("/cms/programs", {

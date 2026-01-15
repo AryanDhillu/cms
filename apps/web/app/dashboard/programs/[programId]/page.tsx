@@ -49,6 +49,12 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
   }, [programId]);
 
   async function updateProgram() {
+    // Validation
+    if (!editTitle || editTitle.trim().length === 0) {
+        alert("Program title is required");
+        return;
+    }
+    
     setIsUpdating(true);
     let finalPublishAt = null;
 
@@ -110,7 +116,10 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
   }
 
   async function createTerm() {
-    if (!termTitle) return;
+    if (!termTitle || termTitle.trim().length === 0) {
+        alert("Term title is required");
+        return;
+    }
     setIsCreatingTerm(true);
 
     try {
@@ -127,6 +136,50 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
       console.error(err);
       alert("Failed to create term");
       setIsCreatingTerm(false);
+    }
+  }
+
+  async function deleteTerm(termId: string) {
+    if (!confirm("Delete Term?\nThis will permanently delete the term. It must have no lessons.")) return;
+
+    try {
+        const res = await apiFetch(`/cms/terms/${termId}`, {
+            method: "DELETE"
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || "Failed to delete term");
+        }
+
+        setProgram((p: any) => ({
+            ...p,
+            terms: p.terms.filter((t: any) => t.id !== termId)
+        }));
+    } catch (err: any) {
+        console.error(err);
+        alert(err.message || "Failed to delete term");
+    }
+  }
+
+  async function deleteProgram() {
+    if (!confirm("Delete Program?\nThis action cannot be undone. You must unpublish it and remove all terms first.")) return;
+
+    try {
+        const res = await apiFetch(`/cms/programs/${program.id}`, {
+            method: "DELETE"
+        });
+
+        if (!res.ok) {
+             const data = await res.json().catch(() => ({}));
+             throw new Error(data.message || "Failed to delete program");
+        }
+        
+        // Redirect to list
+        window.location.href = "/dashboard/programs";
+    } catch (err: any) {
+        console.error(err);
+        alert(err.message || "Failed to delete program");
     }
   }
 
@@ -149,6 +202,7 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
             publishOption={publishOption} setPublishOption={setPublishOption}
             editPublishAt={editPublishAt} setEditPublishAt={setEditPublishAt}
             savedPublishAt={program.publishAt}
+            deleteProgram={deleteProgram}
          />
 
          <div className="md:col-span-2 space-y-6">
@@ -159,6 +213,7 @@ export default function ProgramDetail({ params }: { params: Promise<{ programId:
                 setTermTitle={setTermTitle}
                 createTerm={createTerm}
                 isCreatingTerm={isCreatingTerm}
+                deleteTerm={deleteTerm}
             />
          </div>
       </div>

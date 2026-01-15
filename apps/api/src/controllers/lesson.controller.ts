@@ -78,6 +78,10 @@ export const updateLesson = async (req: Request, res: Response) => {
     const current = await prisma.lesson.findUnique({ where: { id } });
     if (!current) return res.status(404).json({ message: "Lesson not found" });
 
+    if (title !== undefined && title.trim().length === 0) {
+      return res.status(400).json({ message: "Lesson title cannot be empty" });
+    }
+
     const updateData: any = {};
     if (title) updateData.title = title;
     if (contentType) updateData.contentType = contentType;
@@ -154,5 +158,17 @@ export const unpublishLesson = async (req: Request, res: Response) => {
     res.json(lesson);
   } catch (error) {
     res.status(500).json({ message: "Failed to unpublish lesson" });
+  }
+};
+
+// DELETE /cms/lessons/:id
+export const deleteLesson = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    await prisma.lesson.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete lesson" });
   }
 };

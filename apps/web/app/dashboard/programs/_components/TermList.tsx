@@ -7,12 +7,14 @@ interface TermListProps {
     setTermTitle: (val: string) => void;
     createTerm: () => void;
     isCreatingTerm: boolean;
+    deleteTerm: (id: string) => void;
 }
 
 export function TermList({ 
     programId, terms, 
     termTitle, setTermTitle, 
-    createTerm, isCreatingTerm 
+    createTerm, isCreatingTerm,
+    deleteTerm 
 }: TermListProps) {
     return (
         <div className="space-y-6">
@@ -33,6 +35,14 @@ export function TermList({
                            </span>
                         </div>
                      </Link>
+                     <div className="border-t border-gray-100 flex justify-end p-2 bg-gray-50 rounded-b-lg">
+                        <button 
+                            onClick={() => deleteTerm(term.id)}
+                            className="text-xs text-gray-400 hover:text-red-500 font-medium px-3 py-1 uppercase"
+                        >
+                           Delete Term
+                        </button>
+                     </div>
                   </li>
                ))}
                {!terms?.length && (

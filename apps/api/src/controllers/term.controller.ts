@@ -10,6 +10,11 @@ export const createTerm = async (req: Request, res: Response) => {
     if (!programId || !termNumber) {
         return res.status(400).json({ message: "Program ID and term number are required" });
     }
+    
+    // Validation
+    if (!title || title.trim().length === 0) {
+      return res.status(400).json({ message: "Term title is required" });
+    }
 
     const term = await prisma.term.create({
       data: {
@@ -31,6 +36,11 @@ export const updateTerm = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
     const { title, termNumber } = req.body;
+    
+    // Validation
+    if (title !== undefined && title.trim().length === 0) {
+       return res.status(400).json({ message: "Term title cannot be empty" });
+    }
 
     const term = await prisma.term.update({
       where: { id },
@@ -71,5 +81,26 @@ export const getTerm = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to fetch term" });
+  }
+};
+
+// DELETE /cms/terms/:id
+export const deleteTerm = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const lessonsCount = await prisma.lesson.count({
+      where: { termId: id },
+    });
+
+    if (lessonsCount > 0) {
+      return res.status(400).json({ message: "Cannot delete term with lessons" });
+    }
+
+    await prisma.term.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete term" });
   }
 };

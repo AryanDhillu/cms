@@ -7,18 +7,21 @@ import {
   getProgram, 
   updateProgram,
   publishProgram,
-  unpublishProgram 
+  unpublishProgram,
+  deleteProgram
 } from "../controllers/program.controller";
 import { 
   createTerm, 
   updateTerm, 
-  getTerm 
+  getTerm,
+  deleteTerm
 } from "../controllers/term.controller";
 import { 
   createLesson, 
   updateLesson,
   publishLesson,
-  unpublishLesson 
+  unpublishLesson,
+  deleteLesson
 } from "../controllers/lesson.controller";
 import { assignUserRole, createCMSUser } from "../controllers/user.controller";
 
@@ -129,6 +132,28 @@ router.put(
   authenticate,
   requireRole(["ADMIN"]),
   assignUserRole
+);
+
+// DELETE routes
+router.delete(
+  "/programs/:id",
+  authenticate,
+  requireRole(["ADMIN"]), // User note: "Except: If you want only ADMIN to delete Programs, enforce it there". I will set it to ADMIN only for safety as this is a destructive op on top level.
+  deleteProgram
+);
+
+router.delete(
+  "/terms/:id",
+  authenticate,
+  requireRole(["ADMIN", "EDITOR"]),
+  deleteTerm
+);
+
+router.delete(
+  "/lessons/:id",
+  authenticate,
+  requireRole(["ADMIN", "EDITOR"]),
+  deleteLesson
 );
 
 export default router;

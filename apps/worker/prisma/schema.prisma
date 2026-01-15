@@ -52,7 +52,7 @@ model Term {
   title      String?
   createdAt  DateTime @default(now())
 
-  program    Program @relation(fields: [programId], references: [id])
+  program    Program @relation(fields: [programId], references: [id], onDelete: Restrict)
   lessons    Lesson[]
 
   @@unique([programId, termNumber])

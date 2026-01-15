@@ -19,6 +19,11 @@ export const createProgram = async (req: Request, res: Response) => {
   try {
     const { title, description, languagePrimary, languagesAvailable, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
     
+    // Validation
+    if (!title || title.trim().length === 0) {
+      return res.status(400).json({ message: "Program title is required" });
+    }
+
     // Default validation values
     const primary = languagePrimary || "en";
     const available = languagesAvailable && languagesAvailable.length > 0 ? languagesAvailable : [primary];
@@ -89,6 +94,10 @@ export const updateProgram = async (req: Request, res: Response) => {
     const newPrimary = languagePrimary || current.languagePrimary;
     const newAvailable = languagesAvailable || current.languagesAvailable;
 
+    if (title !== undefined && title.trim().length === 0) {
+        return res.status(400).json({ message: "Program title cannot be empty" });
+    }
+
     if (!newAvailable.includes(newPrimary)) {
         return res.status(400).json({ message: "Primary language must be included in available languages" });
     }
@@ -149,5 +158,35 @@ export const unpublishProgram = async (req: Request, res: Response) => {
     res.json(program);
   } catch (error) {
     res.status(500).json({ message: "Failed to unpublish program" });
+  }
+};
+
+// DELETE /cms/programs/:id
+export const deleteProgram = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const program = await prisma.program.findUnique({
+      where: { id },
+      include: { terms: true },
+    });
+
+    if (!program) {
+      return res.status(404).json({ message: "Program not found" });
+    }
+
+    if (program.status === "published") {
+      return res.status(400).json({ message: "Unpublish before deleting" });
+    }
+
+    if (program.terms.length > 0) {
+      return res.status(400).json({ message: "Delete terms first" });
+    }
+
+    await prisma.program.delete({ where: { id } });
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete program" });
   }
 };

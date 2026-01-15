@@ -12,6 +12,16 @@ export default function LoginPage() {
   const [success, setSuccess] = useState(false);
 
   async function login() {
+    // Validation
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    if (!password || password.trim().length === 0) {
+      setError("Password is required");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setSuccess(false);

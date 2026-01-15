@@ -48,42 +48,44 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white">
-      <div className="w-full max-w-sm space-y-4">
-        <h1 className="text-2xl font-semibold">CMS Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-900">
+      <div className="w-full max-w-sm space-y-4 p-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <h1 className="text-2xl font-bold tracking-tight text-center mb-6">CMS Login</h1>
 
-        <input
-          className="w-full p-2 text-black border rounded"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className="space-y-4">
+          <input
+            className="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <input
-          className="w-full p-2 text-black border rounded"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            className="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
         <button
           onClick={login}
           disabled={loading}
-          className="w-full bg-white text-black py-2 rounded font-medium hover:bg-gray-200 disabled:opacity-50 transition-colors"
+          className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors mt-2 shadow-sm"
         >
-          {loading ? "Logging in…" : "Login"}
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         {error && (
-          <p className="text-red-400 text-sm bg-red-900/20 p-2 rounded border border-red-900">
-            ❌ {error}
+          <p className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200 text-center">
+            {error}
           </p>
         )}
 
         {success && (
-          <p className="text-green-400 text-sm bg-green-900/20 p-2 rounded border border-green-900">
-            ✅ Login successful — redirecting…
+          <p className="text-green-600 text-sm bg-green-50 p-2 rounded border border-green-200 text-center">
+            Login successful - redirecting...
           </p>
         )}
       </div>

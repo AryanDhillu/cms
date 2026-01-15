@@ -22,7 +22,6 @@ export const requireRole = (allowedRoles: Role[]) => {
       return res.status(403).json({ message: "Forbidden" });
     }
 
-    // Attach role to request for later use
     (req as any).role = role;
 
     next();

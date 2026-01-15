@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
-// Force re-check
-// GET /cms/programs
 export const listPrograms = async (req: Request, res: Response) => {
   try {
     const programs = await prisma.program.findMany({
@@ -14,17 +12,14 @@ export const listPrograms = async (req: Request, res: Response) => {
   }
 };
 
-// POST /cms/programs
 export const createProgram = async (req: Request, res: Response) => {
   try {
     const { title, description, languagePrimary, languagesAvailable, thumbnailUrl, bannerUrl, portraitUrl } = req.body;
     
-    // Validation
     if (!title || title.trim().length === 0) {
       return res.status(400).json({ message: "Program title is required" });
     }
 
-    // Default validation values
     const primary = languagePrimary || "en";
     const available = languagesAvailable && languagesAvailable.length > 0 ? languagesAvailable : [primary];
 
@@ -52,7 +47,6 @@ export const createProgram = async (req: Request, res: Response) => {
   }
 };
 
-// GET /cms/programs/:id
 export const getProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -78,7 +72,6 @@ export const getProgram = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /cms/programs/:id
 export const updateProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -87,7 +80,6 @@ export const updateProgram = async (req: Request, res: Response) => {
         thumbnailUrl, bannerUrl, portraitUrl, publishAt 
     } = req.body;
 
-    // Fetch existing if partial update
     const current = await prisma.program.findUnique({ where: { id } });
     if (!current) return res.status(404).json({ message: "Program not found" });
 
@@ -123,7 +115,6 @@ export const updateProgram = async (req: Request, res: Response) => {
   }
 };
 
-// POST /cms/programs/:id/publish
 export const publishProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -142,7 +133,6 @@ export const publishProgram = async (req: Request, res: Response) => {
   }
 };
 
-// POST /cms/programs/:id/unpublish
 export const unpublishProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -161,7 +151,6 @@ export const unpublishProgram = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /cms/programs/:id
 export const deleteProgram = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;

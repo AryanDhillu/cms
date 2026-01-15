@@ -12,11 +12,11 @@ export default function LoginPage() {
   const [success, setSuccess] = useState(false);
 
   async function login() {
-    // Validation
     if (!email || !email.includes("@")) {
       setError("Please enter a valid email address");
       return;
     }
+
     if (!password || password.trim().length === 0) {
       setError("Password is required");
       return;
@@ -31,8 +31,6 @@ export default function LoginPage() {
       password,
     });
 
-    console.log("LOGIN RESULT", { data, error });
-
     setLoading(false);
 
     if (error) {
@@ -42,62 +40,69 @@ export default function LoginPage() {
 
     if (data.session) {
       setSuccess(true);
-
-      // Set cookie for Server Components
-      // Note: 'Secure' flag can prevent cookies from being set on localhost (http).
-      // We conditionally apply it only in production.
       const isProduction = process.env.NODE_ENV === "production";
       document.cookie = `access_token=${data.session.access_token}; path=/; max-age=${data.session.expires_in}; SameSite=Lax${isProduction ? "; Secure" : ""}`;
 
-      // Redirect after short delay
       setTimeout(() => {
-        // Force full page reload to ensure Server Components pick up the new cookie
         window.location.href = "/dashboard";
       }, 800);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-900">
-      <div className="w-full max-w-sm space-y-4 p-8 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight text-center mb-6">CMS Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden md:max-w-xl">
+        <div className="md:flex">
+            <div className="w-full p-8 md:p-10">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+                    <p className="text-gray-500 text-sm">Sign in to your account</p>
+                </div>
 
-        <div className="space-y-4">
-          <input
-            className="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+                <div className="space-y-5">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            placeholder="name@company.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
 
-          <input
-            className="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+                    <button
+                        onClick={login}
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {loading ? "Signing in..." : "Sign In"}
+                    </button>
+                    
+                    {error && (
+                        <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm text-center">
+                            {error}
+                        </div>
+                    )}
+                    
+                    {success && (
+                        <div className="p-3 rounded-lg bg-green-50 border border-green-100 text-green-600 text-sm text-center">
+                            Login successful. Redirecting...
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
-
-        <button
-          onClick={login}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors mt-2 shadow-sm"
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-
-        {error && (
-          <p className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200 text-center">
-            {error}
-          </p>
-        )}
-
-        {success && (
-          <p className="text-green-600 text-sm bg-green-50 p-2 rounded border border-green-200 text-center">
-            Login successful - redirecting...
-          </p>
-        )}
       </div>
     </div>
   );

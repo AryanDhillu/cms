@@ -27,7 +27,6 @@ import { assignUserRole, createCMSUser } from "../controllers/user.controller";
 
 const router = Router();
 
-// Content: ADMIN or EDITOR
 router.get(
   "/programs",
   authenticate,
@@ -119,7 +118,6 @@ router.put(
   updateLesson
 );
 
-// User Management: ADMIN only
 router.post(
   "/admin/users",
   authenticate,
@@ -134,11 +132,10 @@ router.put(
   assignUserRole
 );
 
-// DELETE routes
 router.delete(
   "/programs/:id",
   authenticate,
-  requireRole(["ADMIN"]), // User note: "Except: If you want only ADMIN to delete Programs, enforce it there". I will set it to ADMIN only for safety as this is a destructive op on top level.
+  requireRole(["ADMIN"]), 
   deleteProgram
 );
 

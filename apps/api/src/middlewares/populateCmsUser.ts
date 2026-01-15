@@ -19,8 +19,6 @@ export async function populateCmsUser(
     });
 
     if (!cmsUser) {
-       // Allow flow to continue, but cmsUser is null. 
-       // requireAdmin will catch this.
        (req as any).cmsUser = null;
     } else {
        (req as any).cmsUser = cmsUser;

@@ -7,11 +7,10 @@ export default function LogoutButton() {
     <button
       onClick={async () => {
         await supabase.auth.signOut();
-        // Clear the server-readable cookie
         document.cookie = "access_token=; path=/; max-age=0; SameSite=Lax; Secure";
-        window.location.href = "/login";
+        window.location.href = "/";
       }}
-      className="text-xs text-gray-500 hover:text-white hover:underline transition-colors w-full text-left"
+      className="text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
     >
       Sign Out
     </button>

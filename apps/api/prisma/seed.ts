@@ -4,7 +4,6 @@ import { Role } from "@prisma/client";
 async function main() {
   console.log("🌱 Seeding catalog with media...");
 
-  // 1. Upsert Program (Rich Demo Data)
   const program = await prisma.program.upsert({
     where: { id: "11111111-1111-1111-1111-111111111111" },
     update: {
@@ -13,7 +12,6 @@ async function main() {
       status: "published",
       publishedAt: new Date(),
       
-      // Language
       languagePrimary: "en",
       languagesAvailable: ["en"],
 
@@ -28,11 +26,9 @@ async function main() {
       status: "published",
       publishedAt: new Date(),
       
-      // Language
       languagePrimary: "en",
       languagesAvailable: ["en"],
       
-      // Media
       thumbnailUrl: "https://images.unsplash.com/photo-1522199710521-72d69614c702",
       bannerUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
       portraitUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
@@ -52,7 +48,6 @@ async function main() {
                   status: "published",
                   publishedAt: new Date(),
                   
-                  // Language
                   contentLanguagePrimary: "en",
                   contentLanguagesAvailable: ["en"],
                   contentUrlsByLanguage: { en: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
@@ -67,7 +62,6 @@ async function main() {
                   durationMs: 720000,
                   status: "draft",
                   
-                  // Language
                   contentLanguagePrimary: "en",
                   contentLanguagesAvailable: ["en"],
                   contentUrlsByLanguage: { en: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
@@ -85,7 +79,6 @@ async function main() {
 
   console.log("✅ Seeded Program:", program.id);
 
-  // 2. Upsert User Role (Idempotent)
   const SUPABASE_USER_ID = "b6d7e9bf-a067-436c-b3c6-d2eb4d3f5c40"; 
 
   await prisma.userRole.upsert({

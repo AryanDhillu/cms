@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
-// POST /cms/terms/:termId/lessons
 export const createLesson = async (req: Request, res: Response) => {
   try {
     const termId = req.params.termId as string;
@@ -14,28 +13,17 @@ export const createLesson = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Term ID, title and content type are required" });
     }
 
-    // Language defaults/logic
     const primaryLang = contentLanguagePrimary || "en";
     const availableLangs = contentLanguagesAvailable || [primaryLang];
     const urlsByLang = contentUrlsByLanguage || (videoUrl ? { [primaryLang]: videoUrl } : {});
 
-    // Validation
     if (!availableLangs.includes(primaryLang)) {
         return res.status(400).json({ message: "Primary content language must be included" });
     }
     if (!urlsByLang[primaryLang] && contentType === 'video') { 
-        // Only enforce for video if strictly following rules, 
-        // basically "if primary language content URL missing"
-        // But if videoUrl is missing, maybe it's fine for draft?
-        // Prompt says "Primary language content URL missing" error is required rule.
-        // Assuming this applies when data is provided.
-        // If it's a draft, maybe looser? 
-        // Spec: "Backend Validation Rules (Very Important) ... throw new Error"
-        // I will return 400.
         return res.status(400).json({ message: "Primary language content URL missing" });
     }
 
-    // Get current lessons count to determine next number
     const lessonsCount = await prisma.lesson.count({
         where: { termId }
     });
@@ -46,7 +34,7 @@ export const createLesson = async (req: Request, res: Response) => {
         title,
         contentType,
         durationMs: duration ? duration * 60 * 1000 : 0, 
-        videoUrl, // Legacy/Fallback
+        videoUrl, 
         thumbnailUrl,
         
         contentLanguagePrimary: primaryLang,
@@ -65,7 +53,6 @@ export const createLesson = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /cms/lessons/:id
 export const updateLesson = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -91,11 +78,9 @@ export const updateLesson = async (req: Request, res: Response) => {
     if (publishAt !== undefined) updateData.publishAt = publishAt;
     if (status) updateData.status = status;
 
-    // Language updates with validation
     if (contentLanguagePrimary || contentLanguagesAvailable || contentUrlsByLanguage) {
         const newPrimary = contentLanguagePrimary || current.contentLanguagePrimary;
         const newAvailable = contentLanguagesAvailable || current.contentLanguagesAvailable;
-        // cast current.contentUrlsByLanguage to any/object to be safe
         const currentUrls = current.contentUrlsByLanguage as any || {};
         const newUrls = contentUrlsByLanguage || currentUrls;
 
@@ -123,7 +108,6 @@ export const updateLesson = async (req: Request, res: Response) => {
   }
 };
 
-// POST /cms/lessons/:id/publish
 export const publishLesson = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -142,7 +126,6 @@ export const publishLesson = async (req: Request, res: Response) => {
   }
 };
 
-// POST /cms/lessons/:id/unpublish
 export const unpublishLesson = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -161,7 +144,6 @@ export const unpublishLesson = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /cms/lessons/:id
 export const deleteLesson = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;

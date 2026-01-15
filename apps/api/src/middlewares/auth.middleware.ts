@@ -5,7 +5,6 @@ export interface AuthenticatedRequest extends Request {
   user?: User;
 }
 
-// Lazy initialization to ensure env vars are loaded
 let supabase: SupabaseClient;
 
 function getSupabase() {
@@ -40,7 +39,6 @@ export async function authenticate(
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
-  // Attach user to request
   (req as AuthenticatedRequest).user = data.user || undefined;
 
   next();

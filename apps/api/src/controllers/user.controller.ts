@@ -16,7 +16,6 @@ export const assignUserRole = async (req: Request, res: Response) => {
   }
 
   try {
-    // Update role in User table (authoritative source)
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { role: role as Role },
@@ -42,8 +41,6 @@ export const createCMSUser = async (req: Request, res: Response) => {
   }
 
   try {
-    // Note: This is an expensive operation if there are many users. 
-    // In production with thousands of users, a direct DB lookup or search index is better.
     const { data, error: authError } = await supabaseAdmin.auth.admin.listUsers({
       page: 1,
       perPage: 1000, 
@@ -69,7 +66,6 @@ export const createCMSUser = async (req: Request, res: Response) => {
       
       const tempPassword = password || "ChangeMe123!";
       
-      // Auto-create the user in Supabase Auth
       const { data: newAuthData, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password: tempPassword,
@@ -85,7 +81,6 @@ export const createCMSUser = async (req: Request, res: Response) => {
       isNewAuth = true;
     }
 
-    // Create Prisma User linked to Supabase ID
     const newUser = await prisma.user.create({
       data: {
         id: authUserId,

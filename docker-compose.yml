@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Database is external (Supabase), so no db service defined here.
+  # If you need a local DB, uncomment the postgres service below.
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: cms-api
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./apps/api/.env
+    restart: always
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        # Note: These are build-time arguments for Next.js
+        NEXT_PUBLIC_API_URL: "http://localhost:3001"
+        # Ensure these are provided in .env (or passed here if hardcoded)
+        # We defaults to localhost, but for actual deployment, use real domain.
+    container_name: cms-web
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/web/.env.local
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - api
+    restart: always
+
+  worker:
+    build:
+      context: ./apps/worker
+      dockerfile: Dockerfile
+    container_name: cms-worker
+    env_file:
+      - ./apps/api/.env # Reusing API env for DATABASE_URL
+    depends_on:
+      - api
+    restart: always

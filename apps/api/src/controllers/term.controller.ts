@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
-// POST /cms/programs/:programId/terms
 export const createTerm = async (req: Request, res: Response) => {
   try {
     const programId = req.params.programId as string;
@@ -11,7 +10,6 @@ export const createTerm = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Program ID and term number are required" });
     }
     
-    // Validation
     if (!title || title.trim().length === 0) {
       return res.status(400).json({ message: "Term title is required" });
     }
@@ -31,13 +29,11 @@ export const createTerm = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /cms/terms/:id
 export const updateTerm = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
     const { title, termNumber } = req.body;
     
-    // Validation
     if (title !== undefined && title.trim().length === 0) {
        return res.status(400).json({ message: "Term title cannot be empty" });
     }
@@ -57,7 +53,6 @@ export const updateTerm = async (req: Request, res: Response) => {
   }
 };
 
-// GET /cms/terms/:id
 export const getTerm = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -84,7 +79,6 @@ export const getTerm = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /cms/terms/:id
 export const deleteTerm = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;

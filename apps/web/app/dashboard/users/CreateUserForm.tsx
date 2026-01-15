@@ -43,11 +43,11 @@ export default function CreateUserForm() {
   }
 
   return (
-    <div className="max-w-md space-y-4 p-4 border rounded bg-white/5 text-black">
+    <div className="max-w-md space-y-4 p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">User Email</label>
+        <label className="text-sm font-medium text-gray-700">User Email</label>
         <input
-          className="w-full border rounded p-2 bg-black text-white placeholder:text-gray-500"
+          className="w-full border border-gray-300 rounded p-2 bg-white text-gray-900 placeholder:text-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           placeholder="user@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -55,9 +55,9 @@ export default function CreateUserForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">Password (Optional)</label>
+        <label className="text-sm font-medium text-gray-700">Password (Optional)</label>
         <input
-          className="w-full border rounded p-2 bg-black text-white placeholder:text-gray-500"
+          className="w-full border border-gray-300 rounded p-2 bg-white text-gray-900 placeholder:text-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           placeholder="Leave blank for 'ChangeMe123!'"
           type="password"
           value={password}
@@ -67,9 +67,9 @@ export default function CreateUserForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">Role</label>
+        <label className="text-sm font-medium text-gray-700">Role</label>
         <select
-          className="w-full border rounded p-2 bg-black text-white"
+          className="w-full border border-gray-300 rounded p-2 bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
           value={role}
           onChange={(e) => setRole(e.target.value)}
         >
@@ -81,13 +81,13 @@ export default function CreateUserForm() {
       <button
         onClick={submit}
         disabled={loading}
-        className="w-full bg-white text-black font-medium px-4 py-2 rounded hover:bg-gray-200 disabled:opacity-50 transition-colors"
+        className="w-full bg-blue-600 text-white font-medium px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
       >
         {loading ? "Creating..." : "Create User"}
       </button>
 
       {message && (
-        <p className={`text-sm p-2 rounded ${isError ? 'bg-red-900/20 text-red-200 border border-red-800' : 'bg-green-900/20 text-green-200 border border-green-800'}`}>
+        <p className={`text-sm p-3 rounded-md ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
           {message}
         </p>
       )}

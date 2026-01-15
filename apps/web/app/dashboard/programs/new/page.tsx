@@ -38,17 +38,17 @@ export default function NewProgramPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6 flex items-center gap-4">
-        <Link href="/dashboard/programs" className="text-gray-500 hover:text-white">
+        <Link href="/dashboard/programs" className="text-gray-500 hover:text-gray-900 transition-colors">
           ← Back
         </Link>
-        <h1 className="text-xl font-bold">Create Program</h1>
+        <h1 className="text-xl font-bold text-gray-900">Create Program</h1>
       </div>
 
-      <div className="space-y-4 bg-white/5 p-6 rounded border border-gray-800">
+      <div className="space-y-4 bg-white p-8 rounded-lg border border-gray-200 shadow-sm">
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-300">Program Title</label>
+          <label className="block text-sm font-medium text-gray-700">Program Title</label>
           <input
-            className="w-full bg-black border border-gray-700 rounded p-2 text-white placeholder:text-gray-600 focus:border-white transition-colors"
+            className="w-full bg-white border border-gray-300 rounded p-2 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
             placeholder="e.g. Full Stack Development"
             value={title}
             onChange={e => setTitle(e.target.value)}
@@ -56,9 +56,9 @@ export default function NewProgramPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-300">Description</label>
+          <label className="block text-sm font-medium text-gray-700">Description</label>
           <textarea
-            className="w-full bg-black border border-gray-700 rounded p-2 text-white placeholder:text-gray-600 focus:border-white transition-colors h-24"
+            className="w-full bg-white border border-gray-300 rounded p-2 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all h-24"
             placeholder="Short description..."
             value={description}
             onChange={e => setDescription(e.target.value)}
@@ -68,7 +68,7 @@ export default function NewProgramPage() {
         <button 
           onClick={create}
           disabled={loading || !title}
-          className="bg-white text-black px-4 py-2 rounded font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto"
+          className="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto shadow-sm"
         >
           {loading ? "Creating..." : "Create Program"}
         </button>
